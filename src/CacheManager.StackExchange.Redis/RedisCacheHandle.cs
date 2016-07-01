@@ -7,6 +7,7 @@ using CacheManager.Core.Internal;
 using CacheManager.Core.Logging;
 using static CacheManager.Core.Utility.Guard;
 using StackRedis = StackExchange.Redis;
+using System.Globalization;
 
 namespace CacheManager.Redis
 {
@@ -70,7 +71,7 @@ return result";
 
         private readonly IDictionary<ScriptType, StackRedis.LoadedLuaScript> shaScripts = new Dictionary<ScriptType, StackRedis.LoadedLuaScript>();
         private readonly CacheManagerConfiguration managerConfiguration;
-        private readonly RedisValueConverter valueConverter;
+        private readonly IRedisValueConverter valueConverter;
         private readonly RedisConnectionManager connection;
         private readonly bool isLuaAllowed = true;
         private RedisConfiguration redisConfiguration = null;
@@ -93,11 +94,12 @@ return result";
             NotNull(managerConfiguration, nameof(managerConfiguration));
             NotNull(configuration, nameof(configuration));
             EnsureNotNull(serializer, "A serializer is required for the redis cache handle");
-
+            
             this.managerConfiguration = managerConfiguration;
             this.Logger = loggerFactory.CreateLogger(this);
             this.valueConverter = new RedisValueConverter(serializer);
             this.redisConfiguration = RedisConfigurations.GetConfiguration(configuration.Key);
+            this.valueConverter = CreateValueConverter(redisConfiguration.ValueConverterType, serializer) as IRedisValueConverter;
             this.connection = new RedisConnectionManager(this.redisConfiguration, loggerFactory);
             this.isLuaAllowed = this.connection.Features.Scripting;
         }
@@ -730,6 +732,37 @@ return result";
                     }
                 }
             }
+        }
+
+        private IRedisValueConverter CreateValueConverter (Type valueConverterType, params object[] args)
+        {
+            Ensure(
+                valueConverterType.GetInterfaces().Any(p => p == typeof(IRedisValueConverter)),
+                "Type must implement {0}, but {1} does not.",
+                typeof(IRedisValueConverter).Name,
+                valueConverterType.FullName
+            );
+
+            IRedisValueConverter valueConverter = null;
+            try
+            {
+                valueConverter = (IRedisValueConverter)Activator.CreateInstance(valueConverterType, args);
+            }
+            catch(Exception ex)
+            {
+                if (ex.InnerException != null)
+                {
+                    throw new InvalidOperationException(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            "Failed to initialize instance of type {0}.",
+                            valueConverterType),
+                        ex.InnerException);
+                }
+
+                throw;
+            }
+            return valueConverter;
         }
     }
 }

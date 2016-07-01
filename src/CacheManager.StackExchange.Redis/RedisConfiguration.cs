@@ -48,7 +48,8 @@ namespace CacheManager.Redis
             bool isSsl = false,
             string sslHost = null,
             int connectionTimeout = 5000,
-            bool allowAdmin = false)
+            bool allowAdmin = false,
+            Type valueConverterType = null)
         {
             NotNullOrWhiteSpace(key, nameof(key));
             NotNull(endpoints, nameof(endpoints));
@@ -66,6 +67,7 @@ namespace CacheManager.Redis
             this.SslHost = sslHost;
             this.ConnectionTimeout = connectionTimeout;
             this.AllowAdmin = allowAdmin;
+            this.ValueConverterType = valueConverterType;
         }
 
         /// <summary>
@@ -163,6 +165,14 @@ namespace CacheManager.Redis
         /// The database.
         /// </value>
         public int Database { get; set; }
+
+        /// <summary>
+        /// Gets or Sets the Type Value Converter for use with the redis database
+        /// </summary>
+        /// <value>
+        /// the type of converter to use
+        /// </value>
+        public Type ValueConverterType { get; set; }
     }
 
     /// <summary>

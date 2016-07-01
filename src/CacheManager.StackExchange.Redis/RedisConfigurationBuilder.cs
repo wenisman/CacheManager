@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using static CacheManager.Core.Utility.Guard;
 
 namespace CacheManager.Redis
@@ -17,6 +18,7 @@ namespace CacheManager.Redis
         private string key = string.Empty;
         private string password = null;
         private string sslHost = null;
+        private Type valueConverterType = typeof(RedisValueConverter);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RedisConfigurationBuilder"/> class.
@@ -111,6 +113,14 @@ namespace CacheManager.Redis
         {
             this.isSsl = true;
             this.sslHost = host;
+            return this;
+        }
+
+        public RedisConfigurationBuilder WithRedisValueConverter(Type valueConverterType)
+        {
+            NotNull(valueConverterType, nameof(valueConverterType));
+
+            this.valueConverterType = valueConverterType;
             return this;
         }
     }
