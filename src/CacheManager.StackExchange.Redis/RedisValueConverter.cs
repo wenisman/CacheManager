@@ -13,21 +13,21 @@ namespace CacheManager.Redis
     //// to/from those types defined internally... I cannot simply cast to my TCacheValue, because its
     //// generic, and not defined as class or struct or anything... so there is basically no other way
 
-    internal interface IRedisValueConverter
+    public interface IRedisValueConverter
     {
         StackRedis.RedisValue ToRedisValue<T>(T value);
 
         T FromRedisValue<T>(StackRedis.RedisValue value, string valueType);
     }
 
-    internal interface IRedisValueConverter<T>
+    public interface IRedisValueConverter<T>
     {
         StackRedis.RedisValue ToRedisValue(T value);
 
         T FromRedisValue(StackRedis.RedisValue value, string valueType);
     }
 
-    internal class RedisValueConverter :
+    public class RedisValueConverter :
         IRedisValueConverter,
         IRedisValueConverter<byte[]>,
         IRedisValueConverter<string>,

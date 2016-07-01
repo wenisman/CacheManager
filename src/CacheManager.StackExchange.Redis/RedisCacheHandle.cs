@@ -94,7 +94,7 @@ return result";
             NotNull(managerConfiguration, nameof(managerConfiguration));
             NotNull(configuration, nameof(configuration));
             EnsureNotNull(serializer, "A serializer is required for the redis cache handle");
-            
+
             this.managerConfiguration = managerConfiguration;
             this.Logger = loggerFactory.CreateLogger(this);
             this.valueConverter = new RedisValueConverter(serializer);
