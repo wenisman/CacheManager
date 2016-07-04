@@ -97,7 +97,7 @@ return result";
 
             this.managerConfiguration = managerConfiguration;
             this.Logger = loggerFactory.CreateLogger(this);
-            this.valueConverter = new RedisValueConverter(serializer);
+            //this.valueConverter = new RedisValueConverter(serializer);
             this.redisConfiguration = RedisConfigurations.GetConfiguration(configuration.Key);
             this.valueConverter = CreateValueConverter(redisConfiguration.ValueConverterType, serializer) as IRedisValueConverter;
             this.connection = new RedisConnectionManager(this.redisConfiguration, loggerFactory);
